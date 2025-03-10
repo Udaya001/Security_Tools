@@ -1,1 +1,1 @@
-This is new securit scanner repo
+This is new security scanner repo
