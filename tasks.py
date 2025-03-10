@@ -13,25 +13,8 @@ from vuln_scanner.network_scanner import run_network_scans
 from vuln_scanner.dir_trav_scanner import run_dtscan
 from vuln_scanner.cmd_inj_scanner import run_cmdscan
 from vuln_scanner.csrf_scanner import scan_csrf
-from logs.logger_config import logger
-
-# Redis Configuration
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_DB = int(os.getenv("REDIS_DB", "1"))
-
-# Redis Connection (with error handling)
-def get_redis_connection():
-    try:
-        redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB, decode_responses=True)
-        redis_client.ping()  # Ensure the Redis server is reachable
-        logger.info(f"Connected to Redis at {REDIS_HOST}:{REDIS_PORT}")
-        return redis_client
-    except redis.ConnectionError as e:
-        logger.error(f"Failed to connect to Redis: {e}")
-        raise Exception("Redis connection failed. Check your Redis server.")
-
-redis_client = get_redis_connection()
+from config.logger_config import logger
+from config.redis_config import redis_client
 
 @celery_app.task(bind=True)
 def run_scan(self, target_url: str, mode: str):

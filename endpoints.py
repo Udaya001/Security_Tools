@@ -5,43 +5,12 @@ from typing import Optional
 from tasks import run_scan
 import json
 import os
-from logs.logger_config import logger
+from config.logger_config import logger
 from urllib.parse import urlparse
+from config.redis_config import get_redis_connection
 
 router = APIRouter()
 
-# Use environment variables to get Redis host (for Docker compatibility)
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")  # Default to localhost for non-Docker environments
-REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_DB = int(os.getenv("REDIS_DB", "1"))  # Ensure this matches your Celery config
-
-# Initialize Redis client
-redis_client = None
-
-def get_redis_client():
-    """Create and return a Redis client."""
-    global redis_client
-    
-    if redis_client is None:
-        
-        try:
-            redis_client = redis.StrictRedis(
-                host=REDIS_HOST,
-                port=REDIS_PORT,
-                db=REDIS_DB,
-                decode_responses=True
-            )
-            redis_client.ping()  # Ensure the Redis server is reachable
-            
-            logger.info(f"Connected to Redis at {REDIS_HOST}:{REDIS_PORT}, DB: {REDIS_DB}")
-        except Exception as e:
-            
-            logger.error(f"Failed to connect to Redis: {e}")
-            raise HTTPException(status_code=500, detail="Failed to connect to Redis")
-    
-    
-    
-    return redis_client
 
 # Request Schema
 class ScanRequest(BaseModel):
@@ -54,12 +23,12 @@ async def start_scan(scan_request: ScanRequest):
     """Starts a scan and returns task_id."""
     try:
         # Validate the mode parameter
-        if scan_request.mode not in [ "security"]:
+        if scan_request.mode.lower() not in [ "security"]:
             raise HTTPException(status_code=400, detail="Invalid mode parameter. Use 'security'")
 
         
         # Initialize Redis client
-        redis_client = get_redis_client()
+        redis_client = get_redis_connection()
         
 
         # Run the scan task in Celery
@@ -88,7 +57,7 @@ async def get_scan_result(task_id: str):
     """Fetches scan results using task_id."""
     try:
         # Initialize Redis client
-        redis_client = get_redis_client()
+        redis_client = get_redis_connection()
 
         # Fetch the scan data from Redis
         scan_id = redis_client.get(task_id)

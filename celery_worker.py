@@ -1,12 +1,7 @@
 from celery import Celery
 import os
-from logs.logger_config import logger
-from redis import Redis
-
-# Redis Configuration
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")  # Default to 'localhost'
-REDIS_PORT = os.getenv("REDIS_PORT", "6379")  # Default to '6379' (string)
-REDIS_DB = os.getenv("REDIS_DB", "1")  # Default to '1' (string)
+from config.logger_config import logger
+from config.redis_config import REDIS_HOST,REDIS_PORT,REDIS_DB
 
 # Convert Redis Port and DB to Integer
 REDIS_PORT = int(REDIS_PORT)
