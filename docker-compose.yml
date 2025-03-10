@@ -1,0 +1,38 @@
+
+
+services:
+  backend:
+    build: .
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=1
+
+  redis:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: ["celery", "-A", "celery_worker:celery_app", "worker", "--loglevel=info", "-Q", "scanning"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - PYTHONPATH=/app  # Ensure Python finds modules in the root
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=1
