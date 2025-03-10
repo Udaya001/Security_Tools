@@ -1,5 +1,6 @@
 import aiohttp
 import re
+import asyncio
 
 # Pre-compiled regex patterns for efficiency and case-insensitivity
 SUSPICIOUS_PATTERNS = [
