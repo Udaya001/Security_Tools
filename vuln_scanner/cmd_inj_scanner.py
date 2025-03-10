@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from logs.logger_config import logger
+from config.logger_config import logger
 
 # Define payloads
 CMD_PAYLOADS = [

@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 import socket
-from logs.logger_config import logger
+from config.logger_config import logger
 from typing import List
 from urllib.parse import urlparse
 
