@@ -1,5 +1,4 @@
 from celery import Celery
-import os
 from config.logger_config import logger
 from config.redis_config import REDIS_HOST,REDIS_PORT,REDIS_DB
 
@@ -28,11 +27,3 @@ celery_app.conf.update(
     result_expires=3600,
 )
 
-# Test Redis Connection
-try:
-    redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
-    redis_client.ping()
-    logger.info("Successfully connected to Redis.")
-except Exception as e:
-    logger.error(f"Error connecting to Redis: {e}")
-    raise Exception("Unable to connect to Redis. Please check your configuration.")

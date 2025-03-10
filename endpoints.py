@@ -1,10 +1,9 @@
-import redis
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from tasks import run_scan
 import json
-import os
+import redis
 from config.logger_config import logger
 from urllib.parse import urlparse
 from config.redis_config import get_redis_connection

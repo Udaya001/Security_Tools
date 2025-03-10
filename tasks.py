@@ -1,8 +1,6 @@
 import uuid
-import redis
 import json
 import asyncio
-import os
 from celery_worker import celery_app
 from vuln_scanner.ssl_scanner import check_ssl
 from vuln_scanner.url_scanner import scan_url
