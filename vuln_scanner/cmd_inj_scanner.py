@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from config.config import logger
+from config.logger_config import logger
 from utils.constants import CMD_PAYLOADS
 
 

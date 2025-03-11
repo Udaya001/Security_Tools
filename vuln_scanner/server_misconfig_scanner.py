@@ -1,6 +1,6 @@
 import aiohttp
 import asyncio
-from config.config import logger
+from config.logger_config import logger
 from utils.constants import SECURITY_HEADERS,SENSITIVE_FILES
 
 async def check_sensitive_files(target_url):

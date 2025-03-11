@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from config.config import logger
+from config.logger_config import logger
 from utils.constants import CSRF_PAYLOADS
 
 async def check_csrf(target_url: str, param: str, payload: str, session: aiohttp.ClientSession) -> dict:
