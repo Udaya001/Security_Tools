@@ -1,17 +1,12 @@
 
-
 services:
   backend:
     build: .
-    container_name: fastapi_app
+    container_name: fastmysite_security
     ports:
       - "8000:8000"
     depends_on:
       - redis
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=1
 
   redis:
     image: redis:latest
@@ -27,12 +22,9 @@ services:
   celery_worker:
     build: .
     container_name: celery_worker
-    command: ["celery", "-A", "celery_worker:celery_app", "worker", "--loglevel=info", "-Q", "scanning"]
+    command: ["celery", "-A", "celery_worker:celery_app", "worker", "--loglevel=info", "--pool=solo","-Q", "scanning"]
     depends_on:
       redis:
         condition: service_healthy
     environment:
-      - PYTHONPATH=/app  # Ensure Python finds modules in the root
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=1
+      - PYTHONPATH=/app  # Ensures Python can find the modules
