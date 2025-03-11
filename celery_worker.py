@@ -1,29 +1,32 @@
 from celery import Celery
-from config.logger_config import logger
-from config.redis_config import REDIS_HOST,REDIS_PORT,REDIS_DB
+from services.redis_service import redis_service
+import os
 
-# Convert Redis Port and DB to Integer
-REDIS_PORT = int(REDIS_PORT)
-REDIS_DB = int(REDIS_DB)
+# Fetch Redis connection details from RedisService
+redis_config = redis_service.get_connection_details()
+REDIS_HOST = redis_config["host"]
+REDIS_PORT = redis_config["port"]
+REDIS_DB = redis_config["db"]
 
-# Log Redis Connection Info
-logger.debug(f"Connecting to Redis at {REDIS_HOST}:{REDIS_PORT}, DB: {REDIS_DB}")
+# Define the Redis URL for Celery
+REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 
-# Celery Configuration
+# Initialize Celery
 celery_app = Celery(
     "tasks",
-    broker=f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
-    backend=f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}",
+    broker=REDIS_URL,
+    backend=REDIS_URL,
     include=["tasks"]
 )
 
-# Add Celery Configurations
 celery_app.conf.update(
     task_routes={
         "tasks.run_scan": {"queue": "scanning"}
     },
     task_serializer="json",
     accept_content=["json"],
+    result_serializer="json",
+    timezone="UTC",
+    enable_utc=True,
     result_expires=3600,
 )
-
