@@ -1,22 +1,7 @@
 import aiohttp
 import asyncio
 from config.config import logger
-
-
-
-
-# List of common sensitive files that shouldn't be publicly accessible
-SENSITIVE_FILES = [
-    ".env", "config.php", "wp-config.php", "database.yml", ".git/", 
-    ".htaccess", "docker-compose.yml", "id_rsa", "id_rsa.pub", 
-    "server.key", "server.crt", "credentials.json"
-]
-
-# Security headers that should be present
-SECURITY_HEADERS = [
-    "Strict-Transport-Security", "X-Frame-Options", "Content-Security-Policy", 
-    "X-XSS-Protection", "X-Content-Type-Options", "Referrer-Policy"
-]
+from utils.constants import SECURITY_HEADERS,SENSITIVE_FILES
 
 async def check_sensitive_files(target_url):
     """Check if sensitive files are accessible"""

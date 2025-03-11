@@ -1,12 +1,9 @@
 import asyncio
 import aiohttp
 from config.config import logger
+from utils.constants import CMD_PAYLOADS
 
-# Define payloads
-CMD_PAYLOADS = [
-    "; ls", "&& whoami", "| id", "$(id)", "& echo vulnerable",
-    "|| cat /etc/passwd", "|| powershell whoami", "0; id"
-]
+
 
 async def check_command_injection(target_url: str, param: str, payload: str, session: aiohttp.ClientSession) -> dict:
     """Check individual payload and return formatted result"""

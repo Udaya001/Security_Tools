@@ -1,14 +1,7 @@
 import asyncio
 import aiohttp
 from config.config import logger
-
-# Define payloads
-PAYLOADS = [
-    "../../etc/passwd",        # Linux
-    "../../windows/win.ini",   # Windows
-    "..%2f..%2fetc%2fpasswd",  # URL Encoded Linux
-    "..\\..\\windows\\win.ini" # Windows Backslashes
-]
+from utils.constants import DIR_PAYLOADS
 
 async def check_directory_traversal(target_url: str, param: str, payload: str, session: aiohttp.ClientSession) -> dict:
     """Check individual payload and return formatted result"""
@@ -42,7 +35,7 @@ async def scan_directory_traversal(target_url: str, param: str) -> dict:
         tasks = []
         vulnerable_urls = []
         
-        for payload in PAYLOADS:
+        for payload in DIR_PAYLOADS:
             task = asyncio.create_task(check_directory_traversal(target_url, param, payload, session))
             tasks.append(task)
         
@@ -57,7 +50,7 @@ async def scan_directory_traversal(target_url: str, param: str) -> dict:
     return {
         "status": "success" if vulnerable_urls else "no_vulnerabilities",
         "vulnerable_urls": vulnerable_urls,
-        "total_payloads": len(PAYLOADS),
+        "total_payloads": len(DIR_PAYLOADS),
         "tested_urls": [res["url"] for res in results]
     }
 

