@@ -1,41 +1,16 @@
-import logging
 import os
 
 class Config:
+    """Centralized configuration for the application."""
 
     # General settings
-    DEBUG = os.getenv("DEBUG", True)
+    DEBUG = os.getenv("DEBUG", "True").lower() == "true"  # Convert string to boolean
     SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
 
-    # Logging Configuration
-    @staticmethod
-    def logger():
-        """Set up application logging."""
-        log_directory = "logs"
-        os.makedirs(log_directory, exist_ok=True)
+    # Redis Configuration
+    REDIS_HOST = os.getenv("REDIS_HOST", "redis")  # Default to 'redis' for Docker
+    REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))  # Default Redis port
+    REDIS_DB = int(os.getenv("REDIS_DB", 1))  # Default Redis DB index
+    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", None)  # Optional Redis password
 
-        log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
-        # Console handler (Logs to terminal)
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        console_handler.setFormatter(log_formatter)
-
-        # File handler (Logs to file)
-        log_file = os.path.join(log_directory, "scan_logs.log")
-        file_handler = logging.FileHandler(log_file, mode='a', encoding='utf-8')
-        file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(log_formatter)
-
-        # Get logger and prevent duplicate handlers
-        logger = logging.getLogger("vuln_scanner")
-        if not logger.hasHandlers():
-            logger.setLevel(logging.INFO)
-            logger.addHandler(console_handler)
-            logger.addHandler(file_handler)
-
-        return logger
-
-# Initialize logger
-logger = Config.logger()
-logger.info(" Logging system initialized.")
+    # Other application-specific configurations can go here

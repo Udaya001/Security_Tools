@@ -1,6 +1,6 @@
 from celery import Celery
 from services.redis_service import redis_service
-import os
+
 
 # Fetch Redis connection details from RedisService
 redis_config = redis_service.get_connection_details()

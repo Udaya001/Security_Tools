@@ -11,7 +11,7 @@ from vuln_scanner.network_scanner import run_network_scans
 from vuln_scanner.dir_trav_scanner import run_dtscan
 from vuln_scanner.cmd_inj_scanner import run_cmdscan
 from vuln_scanner.csrf_scanner import scan_csrf
-from config.config import logger  
+from config.logger_config import logger  
 from services.redis_service import redis_service  
 
 @celery_app.task(bind=True)

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 from tasks import run_scan
 import json
-from config.config import logger
+from config.logger_config import logger
 from services.redis_service import redis_service 
 from schemas import ScanRequest
 

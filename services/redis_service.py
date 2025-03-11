@@ -1,16 +1,17 @@
 import redis
-import os
-import json
-from config.config import logger  
+from config.config import Config
+from config.logger_config import logger
+
 
 class RedisService:
-    """Handles Redis-related services"""
+    """Handles Redis-related services."""
 
     def __init__(self):
-        # Get Redis connection details from environment variables (or use defaults)
-        self.host = os.getenv("REDIS_HOST", "redis")  # Default to 'redis' for Docker
-        self.port = int(os.getenv("REDIS_PORT", 6379))  # Default Redis port
-        self.db = int(os.getenv("REDIS_DB", 1))  # Default Redis DB index
+        # Get Redis connection details from the centralized Config class
+        self.host = Config.REDIS_HOST
+        self.port = Config.REDIS_PORT
+        self.db = Config.REDIS_DB
+        self.password = Config.REDIS_PASSWORD
 
         self.client = self.connect_to_redis()
 
@@ -21,6 +22,7 @@ class RedisService:
                 host=self.host,
                 port=self.port,
                 db=self.db,
+                password=self.password,
                 decode_responses=True
             )
             client.ping()  # Ensure Redis is reachable
@@ -32,7 +34,12 @@ class RedisService:
 
     def get_connection_details(self):
         """Return Redis connection details."""
-        return {"host": self.host, "port": self.port, "db": self.db}
+        return {
+            "host": self.host,
+            "port": self.port,
+            "db": self.db,
+            "password": "******" if self.password else None  # Mask password for security
+        }
 
     def set(self, key, value):
         """Set a key in Redis."""
@@ -53,6 +60,7 @@ class RedisService:
     def ttl(self, key):
         """Get the remaining time-to-live (TTL) of a key in Redis."""
         return self.client.ttl(key)
+
 
 # Create an instance for direct import
 redis_service = RedisService()
