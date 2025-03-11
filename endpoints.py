@@ -3,18 +3,11 @@ from pydantic import BaseModel
 from typing import Optional
 from tasks import run_scan
 import json
-import redis
-from config.logger_config import logger
-from urllib.parse import urlparse
-from config.redis_config import get_redis_connection
+from config.config import logger
+from services.redis_service import redis_service 
+from schemas import ScanRequest
 
 router = APIRouter()
-
-
-# Request Schema
-class ScanRequest(BaseModel):
-    target_url: str
-    mode: Optional[str] = "both"
 
 # Start a Scan (Runs in Celery)
 @router.post("/scan/url")
@@ -22,19 +15,14 @@ async def start_scan(scan_request: ScanRequest):
     """Starts a scan and returns task_id."""
     try:
         # Validate the mode parameter
-        if scan_request.mode.lower() not in [ "security"]:
+        if scan_request.mode.lower() not in ["security"]:
             raise HTTPException(status_code=400, detail="Invalid mode parameter. Use 'security'")
-
-        
-        # Initialize Redis client
-        redis_client = get_redis_connection()
-        
 
         # Run the scan task in Celery
         task = run_scan.apply_async(args=[scan_request.target_url, scan_request.mode])
 
         # Store the initial task status in Redis (clear existing data for the task)
-        redis_client.setex(task.id, 3600, json.dumps({"status": "processing"}))  # Expires in 1 hour
+        redis_service.set(task.id, json.dumps({"status": "processing"}))  
 
         # Log the scan start
         logger.info(f"Scan started for {scan_request.target_url}, Task ID: {task.id}")
@@ -43,6 +31,7 @@ async def start_scan(scan_request: ScanRequest):
             "task_id": task.id,
             "message": f"Scan started. Use /api/scan/result/{task.id} to check status."
         }
+
     except HTTPException as he:
         logger.error(f"HTTPException starting scan: {he.detail}")
         raise he
@@ -55,13 +44,10 @@ async def start_scan(scan_request: ScanRequest):
 async def get_scan_result(task_id: str):
     """Fetches scan results using task_id."""
     try:
-        # Initialize Redis client
-        redis_client = get_redis_connection()
-
         # Fetch the scan data from Redis
-        scan_id = redis_client.get(task_id)
+        scan_id = redis_service.get(task_id)
 
-        scan_data = redis_client.get(scan_id)
+        scan_data = redis_service.get(scan_id)
 
         # If no data is found, the scan may still be processing
         if scan_data is None:
@@ -78,7 +64,7 @@ async def get_scan_result(task_id: str):
         logger.info("Successfully loaded scan result data")
 
         # Optionally check for TTL (time-to-live) in Redis to see if the scan has expired
-        ttl = redis_client.ttl(task_id)
+        ttl = redis_service.ttl(task_id)
         if ttl == -2:
             logger.warning(f"Scan for Task ID {task_id} does not exist in Redis.")
             raise HTTPException(status_code=404, detail="Scan result expired or does not exist")
@@ -86,9 +72,6 @@ async def get_scan_result(task_id: str):
         # Return the scan result as a response
         return scan_result
 
-    except redis.RedisError as e:
-        logger.error(f"Redis error occurred while fetching scan result for Task ID {task_id}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch scan result from Redis")
     except Exception as e:
         logger.error(f"Error fetching scan result for Task ID {task_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch scan result")
