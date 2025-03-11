@@ -1,6 +1,6 @@
 import asyncio
 import aiohttp
-from config.logger_config import logger
+from config.config import logger
 
 # Extended CSRF payloads (attack vectors)
 CSRF_PAYLOADS = [

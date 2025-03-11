@@ -33,7 +33,7 @@ ERROR_KEYWORDS = [
     "You have an error in your SQL syntax"
 ]
 
-async def run_sqlmap_alt(target_url: str):
+async def run_sql_alt(target_url: str):
     parsed_url = urlparse(target_url)
     query_params = parse_qs(parsed_url.query)
 

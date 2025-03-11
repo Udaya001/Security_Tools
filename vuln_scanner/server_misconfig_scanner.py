@@ -1,6 +1,6 @@
 import aiohttp
 import asyncio
-from config.logger_config import logger
+from config.config import logger
 
 
 
