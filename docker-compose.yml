@@ -22,7 +22,8 @@ services:
   celery_worker:
     build: .
     container_name: celery_worker
-    command: ["celery", "-A", "celery_worker:celery_app", "worker", "--loglevel=info", "--pool=solo","-Q", "scanning"]
+    command: ["celery", "-A", "celery_worker:celery_app", "worker", "--loglevel=info", "--pool=prefork", "--concurrency=6", "-Q", "scanning"]
+
     depends_on:
       redis:
         condition: service_healthy
