@@ -13,8 +13,10 @@ from vuln_scanner.cmd_inj_scanner import run_cmdscan
 from vuln_scanner.csrf_scanner import scan_csrf
 from config.logger_config import logger  
 from services.redis_service import redis_service  
+from timing_decorator import measure_time
 
 @celery_app.task(bind=True)
+@measure_time
 def run_scan(self, target_url: str, mode: str):
     """Executes the scan asynchronously and stores results in Redis"""
     scan_id = str(uuid.uuid4())
@@ -53,6 +55,7 @@ def run_scan(self, target_url: str, mode: str):
 
     return scan_id
 
+@measure_time
 async def execute_scan(domain: str, target_url: str, mode: str) -> dict:
     """Executes all security scans asynchronously"""
     scan_tasks = {}

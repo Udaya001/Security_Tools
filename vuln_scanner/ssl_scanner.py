@@ -1,7 +1,10 @@
 import ssl
 import socket
 import asyncio
+from timing_decorator import measure_time
 
+
+@measure_time
 async def check_ssl(domain: str):
     """Check SSL certificate details for a domain asynchronously."""
     context = ssl.create_default_context()

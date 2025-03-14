@@ -6,11 +6,14 @@ import json
 from config.logger_config import logger
 from services.redis_service import redis_service 
 from schemas import ScanRequest
+from timing_decorator import measure_time
 
 router = APIRouter()
 
 # Start a Scan (Runs in Celery)
+
 @router.post("/scan/url")
+@measure_time
 async def start_scan(scan_request: ScanRequest):
     """Starts a scan and returns task_id."""
     try:
@@ -41,6 +44,7 @@ async def start_scan(scan_request: ScanRequest):
 
 # Check Scan Result
 @router.get("/scan/result/{task_id}")
+@measure_time
 async def get_scan_result(task_id: str):
     """Fetches scan results using task_id."""
     try:
@@ -75,3 +79,5 @@ async def get_scan_result(task_id: str):
     except Exception as e:
         logger.error(f"Error fetching scan result for Task ID {task_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch scan result")
+
+

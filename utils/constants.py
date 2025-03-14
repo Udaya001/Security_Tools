@@ -67,6 +67,21 @@ COMMON_PORTS = [
     27017, 27018, 28015, 32400
 ]
 
+OPTIMIZED_SERVICE_MAP = {
+    21: "FTP", 22: "SSH", 23: "Telnet", 25: "SMTP", 53: "DNS", 
+    80: "HTTP", 110: "POP3", 111: "RPC", 135: "MSRPC", 139: "NetBIOS", 
+    143: "IMAP", 443: "HTTPS", 445: "SMB", 465: "SMTPS", 587: "SMTP", 
+    636: "LDAPS", 993: "IMAPS", 995: "POP3S", 1433: "MSSQL", 1521: "Oracle", 
+    1723: "PPTP", 2049: "NFS", 2375: "Docker", 2376: "Docker", 
+    3000: "Node", 3306: "MySQL", 3389: "RDP", 4500: "IPsec", 5000: "UPnP", 
+    5432: "PostgreSQL", 5601: "Kibana", 5672: "AMQP", 5900: "VNC", 
+    5984: "CouchDB", 6379: "Redis", 7474: "Neo4j", 7687: "Bolt", 
+    8000: "HTTP-Alt", 8080: "HTTP-Proxy", 8081: "HTTP-Alt", 8443: "HTTPS-Alt", 
+    8500: "Consul", 8888: "Jupyter", 9000: "PHP", 9042: "Cassandra", 
+    9090: "Prometheus", 9200: "Elastic", 9418: "Git", 11211: "Memcached", 
+    15672: "RabbitMQ", 27017: "MongoDB"
+}
+
 # Server Misconfigurations Scanner
 SENSITIVE_FILES = [
     ".env", "config.php", "wp-config.php", "database.yml", ".git/", 
