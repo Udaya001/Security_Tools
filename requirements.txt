@@ -1,0 +1,16 @@
+aiohttp==3.11.13
+amqp==5.3.1
+billiard==4.2.1
+cryptography==44.0.2
+celery==5.4.0
+fastapi==0.115.9
+kombu==5.4.2
+pydantic==2.10.6
+python-dateutil==2.9.0.post0
+python-multipart==0.0.20
+redis==5.2.1
+requests==2.32.3
+starlette==0.45.3
+tzdata==2025.1
+uvicorn==0.34.0
+vine==5.1.0
